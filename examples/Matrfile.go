@@ -23,11 +23,12 @@ func Build(ctx context.Context) (context.Context, error) {
 	matr.Deps(ctx, Proto, Test)
 	fmt.Println("Building...")
 
-	return ctx, tlkn.Bash(`
+	_, err := tlkn.Bash(ctx, `
 		ls -la
 		echo $GOPATH
 		ls -l
 	`)
+	return ctx, err
 }
 
 // Run is used as and example handler
@@ -47,13 +48,16 @@ func notExported(ctx context.Context) (context.Context, error) {
 
 // Proto will build the protobuf files into golang files
 func Proto(ctx context.Context) (context.Context, error) {
-	err := tlkn.Bash("echo \"build some proto file\"")
+	out, err := tlkn.Bash(ctx, "echo \"build some proto file\"")
+	fmt.Println(string(out))
 	return ctx, err
 }
 
 // Test is used as and example handler
 func Test(ctx context.Context) (context.Context, error) {
-	err := tlkn.Bash(`echo "Run unit tests..."`)
+	out, err := tlkn.Bash(ctx, `echo "Run unit tests..."`)
+	fmt.Println(string(out))
+
 	time.Sleep(1 * time.Second)
 	return ctx, err
 }
@@ -62,14 +66,23 @@ func Test(ctx context.Context) (context.Context, error) {
 func Bench(ctx context.Context) (context.Context, error) {
 	args := matr.Args(ctx)
 	fmt.Println(args)
-	return ctx, tlkn.Bash(`
-		echo "Run benchmark......"
-	`)
+
+	out, err := tlkn.Bash(ctx, `echo "Run benchmark......"`)
+	fmt.Println(string(out))
+
+	return ctx, err
 }
 
 // Docker is used as and example handler
 func Docker(ctx context.Context) (context.Context, error) {
-	return ctx, tlkn.Bash(`
-		echo "Build some docker file...."
-	`)
+	out, err := tlkn.Bash(ctx, `echo "Build some docker file...."`)
+	fmt.Println(string(out))
+	return ctx, err
+}
+
+// Docker is used as and example handler
+func DockerCompose(ctx context.Context) (context.Context, error) {
+	out, err := tlkn.Bash(ctx, `echo "Build some docker-compose file...."`)
+	fmt.Println(string(out))
+	return ctx, err
 }
