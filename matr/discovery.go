@@ -52,7 +52,7 @@ func Run() {
 	}
 
 	for _, c := range cmds {
-		if strings.ToLower(c.Name) != cmd {
+		if c.Name != strings.Title(cmd) {
 			continue
 		}
 		validCmd = true
