@@ -12,7 +12,7 @@ import (
 )
 
 // Default is an example of overriding the default handler
-func Default(ctx context.Context) (context.Context, error) {
+func DefaultX(ctx context.Context) (context.Context, error) {
 	fmt.Println("Running Custom Default HandlerFunc...")
 	Build(ctx)
 	return ctx, nil
@@ -80,7 +80,9 @@ func Docker(ctx context.Context) (context.Context, error) {
 	return ctx, err
 }
 
-// Docker is used as and example handler
+// DockerCompose is used as and example handler
+// This is a multi line comment that should
+// show up in the full docs
 func DockerCompose(ctx context.Context) (context.Context, error) {
 	out, err := tlkn.Bash(ctx, `echo "Build some docker-compose file...."`)
 	fmt.Println(string(out))

@@ -60,9 +60,13 @@ func parseCmd(t *ast.FuncDecl) Command {
 	}
 
 	if t.Doc != nil {
-		d := strings.SplitN(t.Doc.Text(), "\n", 2)
+		d := []string{}
+		for _, ds := range t.Doc.List {
+
+			d = append(d, strings.Replace(ds.Text, "//", "", 1))
+		}
 		cmd.Summary = d[0]
-		cmd.Doc = strings.Replace(t.Doc.Text(), "\n", "\r", -1)
+		cmd.Doc = strings.Join(d, "\n")
 	}
 
 	if t.Type == nil || t.Type.Params == nil || len(t.Type.Params.List) == 0 {
