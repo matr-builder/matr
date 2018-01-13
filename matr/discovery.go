@@ -84,7 +84,7 @@ func usage(cmds []parser.Command) func() {
 				if lowerFirst(c.Name) == cmd {
 					fmt.Println("matr " + cmd + " :\n")
 					fmt.Println(c.Doc)
-					fmt.Print("\n")
+					fmt.Println("")
 					return
 				}
 			}
