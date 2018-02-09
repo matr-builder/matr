@@ -60,9 +60,6 @@ func Run() {
 	}
 
 	if helpFlag || !validCmd {
-		if cmd != "default" {
-			os.Stderr.WriteString("No handler found for target: " + cmd + "\n\n")
-		}
 		flag.Usage()
 		return
 	}
