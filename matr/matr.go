@@ -10,14 +10,14 @@ type ContextKey string
 
 // Matr is the root structure
 type Matr struct {
-	tasks  map[string]Task
+	tasks  map[string]*Task
 	onExit func(context.Context, error)
 }
 
 // New creates a new Matr struct instance and returns a point to it
 func New() *Matr {
 	return &Matr{
-		tasks: map[string]Task{},
+		tasks: map[string]*Task{},
 	}
 }
 
@@ -34,16 +34,11 @@ func (m *Matr) TaskNames() []string {
 // if a task is named "default" or "" that function will be called if no function name is provided. The
 // default function is also a good place to output usage information for the available tasks.
 // CallOptions can be used to allow for before and after Handler middleware functions.
-func (m *Matr) Handle(name string, fn HandlerFunc) Task {
-	if name == "" {
-		name = "default"
+func (m *Matr) Handle(task *Task) {
+	if task.Name == "" {
+		task.Name = "default"
 	}
-	task := Task{
-		Name:    name,
-		Handler: fn,
-	}
-	m.tasks[name] = task
-	return m.tasks[name]
+	m.tasks[task.Name] = task
 }
 
 // Run will execute the requested task function with the provided context and arguments.
