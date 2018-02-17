@@ -12,7 +12,7 @@ import (
 )
 
 // Default is an example of overriding the default handler
-func DefaultX(ctx context.Context) (context.Context, error) {
+func Default(ctx context.Context) (context.Context, error) {
 	fmt.Println("Running Custom Default HandlerFunc...")
 	Build(ctx)
 	return ctx, nil

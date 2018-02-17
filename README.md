@@ -30,12 +30,12 @@ output...
 List available targets and matr flags
 
 ```bash
-$ matr -help
+$ matr -h
 Usage: matr <opts> [target] args...
 
 Options:
   -matrfile  Matrfile path (default "./")
-  -help  Display usage info
+  -h         Display usage info
 
 Targets:
    build    Build will builds the project
@@ -49,7 +49,7 @@ Targets:
 Get expanded help for a target
 
 ```bash
-$ matr -help [target]
+$ matr -h [target]
 ```
 
 ## Matrfile

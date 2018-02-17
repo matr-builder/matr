@@ -34,15 +34,21 @@ var (
 func Run() {
 	// TODO: clean up this shit show
 	flag.StringVar(&matrFilePath, "matrfile", "./", "path to Matrfile")
-	flag.BoolVar(&helpFlag, "help", false, "Display usage info")
+	flag.BoolVar(&helpFlag, "h", false, "Display usage info")
+
+	flag.Parse()
 
 	cmds, err := parseMatrfile(matrFilePath)
 	if err != nil {
-		log.Fatal(err)
-	}
+		flag.Usage()
+		if helpFlag && flag.Arg(0) == "" {
+			fmt.Print("\nTargets:\n  No Matrfile.go or Matrfile found\n")
+			return
+		}
 
-	flag.Usage = usage(cmds)
-	flag.Parse()
+		fmt.Print("\n  " + err.Error() + "\n")
+		return
+	}
 
 	cmd := flag.Arg(0)
 	validCmd := false
@@ -60,6 +66,7 @@ func Run() {
 	}
 
 	if helpFlag || !validCmd {
+		flag.Usage = usage(cmds)
 		flag.Usage()
 		return
 	}
@@ -200,7 +207,7 @@ func getMatrfilePath(matrFilePath string) (string, error) {
 
 	fp, err := os.Stat(matrFilePath)
 	if err != nil {
-		return "", errors.New("Error: unable to find Matrfile: " + matrFilePath)
+		return "", errors.New("unable to find Matrfile: " + matrFilePath)
 	}
 
 	if !fp.IsDir() {
@@ -217,7 +224,7 @@ func getMatrfilePath(matrFilePath string) (string, error) {
 		return matrFilePath, nil
 	}
 
-	return "", errors.New("Error: unable to find Matrfile")
+	return "", errors.New("unable to find Matrfile")
 }
 
 func symlinkValid(path string) bool {
