@@ -132,6 +132,8 @@ func parseMatrfile(path string) ([]parser.Command, error) {
 func generate(cmds []parser.Command, w io.Writer) error {
 	// Create a new template and parse the letter into it.
 	t := template.Must(template.New("letter").Funcs(template.FuncMap{
+		"title": strings.Title,
+		"trim":  strings.TrimSpace,
 		"cmdname": func(name string) string {
 			s := strings.Replace(name, "_", ":", -1)
 			r, n := utf8.DecodeRuneInString(s)

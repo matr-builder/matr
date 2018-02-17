@@ -19,7 +19,12 @@ func main() {
 	{{- range .}}
 	{{if .IsExported }}
 	// {{if .Summary}}{{.Summary}}{{else}}{{.Name}}{{end}}
-	m.Handle("{{cmdname .Name}}", {{.Name}})
+	m.Handle(&matr.Task{
+		Name: "{{cmdname .Name}}",
+		Summary: "{{trim .Summary}}",
+		Doc: ` + "`{{trim .Doc}}`," + `
+		Handler: {{.Name}},
+	})
 	{{- end -}}
 	{{- end}}
 
