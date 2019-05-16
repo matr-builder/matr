@@ -38,7 +38,7 @@ func Parse(file string) ([]Command, error) {
 	funcs := []Command{}
 
 	if len(f.Comments) == 0 || f.Comments[0].Pos() != 1 || f.Comments[0].Text() != "+build matr\n" {
-		return funcs, errors.New("Invalid Matrfile. No matr build tag found.")
+		return funcs, errors.New("invalid Matrfile: o matr build tag found")
 	}
 
 	for _, d := range f.Decls {
