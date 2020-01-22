@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/codeskyblue/go-sh"
 	"github.com/matr-builder/matr/matr"
 )
 
@@ -23,7 +22,7 @@ func Build(ctx context.Context) (context.Context, error) {
 	matr.Deps(ctx, Proto, Test)
 	fmt.Println("Building...")
 
-	err := sh.Command(`
+	err := matr.Sh(`
 		ls -la
 		echo $GOPATH
 		ls -l
@@ -48,13 +47,13 @@ func notExported(ctx context.Context) (context.Context, error) {
 
 // Proto will build the protobuf files into golang files
 func Proto(ctx context.Context) (context.Context, error) {
-	err := sh.Command("echo \"build some proto file\"").Run()
+	err := matr.Sh("echo \"build some proto file\"").Run()
 	return ctx, err
 }
 
 // Test is used as and example handler
 func Test(ctx context.Context) (context.Context, error) {
-	err := sh.Command(`echo "Run unit tests..."`).Run()
+	err := matr.Sh(`echo "Run unit tests..."`).Run()
 	time.Sleep(1 * time.Second)
 	return ctx, err
 }
@@ -64,13 +63,13 @@ func Bench(ctx context.Context) (context.Context, error) {
 	args := matr.Args(ctx)
 	fmt.Println(args)
 
-	err := sh.Command(`echo "Run benchmark......"`).Run()
+	err := matr.Sh(`echo "Run benchmark......"`).Run()
 	return ctx, err
 }
 
 // Docker is used as and example handler
 func Docker(ctx context.Context) (context.Context, error) {
-	err := sh.Command(`echo "Build some docker file...."`).Run()
+	err := matr.Sh(`echo "Build some docker file...."`).Run()
 	return ctx, err
 }
 
@@ -78,6 +77,6 @@ func Docker(ctx context.Context) (context.Context, error) {
 // This is a multi line comment that should
 // show up in the full docs
 func DockerCompose(ctx context.Context) (context.Context, error) {
-	err := sh.Command(`echo "Build some docker-compose file...."`).Run()
+	err := matr.Sh(`echo "Build some docker-compose file...."`).Run()
 	return ctx, err
 }

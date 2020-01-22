@@ -58,7 +58,7 @@ func Run() {
 	}
 
 	for _, c := range cmds {
-		if c.Name != strings.Title(cmd) {
+		if parser.CamelToHyphen(c.Name) != cmd {
 			continue
 		}
 		validCmd = true
@@ -85,7 +85,7 @@ func usage(cmds []parser.Command) func() {
 	return func() {
 		if cmd := flag.Arg(0); cmd != "" {
 			for _, c := range cmds {
-				if lowerFirst(c.Name) == cmd {
+				if parser.CamelToHyphen(c.Name) == cmd {
 					fmt.Println("matr " + cmd + " :\n")
 					fmt.Println(c.Doc)
 					fmt.Println("")
@@ -106,7 +106,7 @@ func usage(cmds []parser.Command) func() {
 			if !cmd.IsExported || cmd.Name == "Default" {
 				continue
 			}
-			fmt.Fprintf(tw, "	%s\t%s\n", lowerFirst(cmd.Name), cmd.Summary)
+			fmt.Fprintf(tw, "	%s\t%s\n", parser.CamelToHyphen(cmd.Name), cmd.Summary)
 		}
 		tw.Flush()
 		fmt.Println(" ")
@@ -142,7 +142,8 @@ func generate(cmds []parser.Command, w io.Writer) error {
 		"title": strings.Title,
 		"trim":  strings.TrimSpace,
 		"cmdname": func(name string) string {
-			s := strings.Replace(name, "_", ":", -1)
+			cn := parser.CamelToHyphen(name)
+			s := strings.Replace(cn, "_", ":", -1)
 			r, n := utf8.DecodeRuneInString(s)
 			return string(unicode.ToLower(r)) + s[n:]
 		},
