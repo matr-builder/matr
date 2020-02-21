@@ -9,7 +9,7 @@ import (
 
 // Args returns the handler args from the context
 func Args(ctx context.Context) []string {
-	args, ok := ctx.Value(ContextKey("args")).([]string)
+	args, ok := ctx.Value(ctxArgsKey).([]string)
 	if !ok {
 		return []string{}
 	}
@@ -18,7 +18,7 @@ func Args(ctx context.Context) []string {
 
 // Arg returns the handler arg at the given position from the context
 func Arg(ctx context.Context, idx int, defaultStr string) (string, bool) {
-	args, ok := ctx.Value(ContextKey("args")).([]string)
+	args, ok := ctx.Value(ctxArgsKey).([]string)
 	if !ok {
 		return defaultStr, false
 	}
@@ -29,17 +29,18 @@ func Arg(ctx context.Context, idx int, defaultStr string) (string, bool) {
 }
 
 // Deps is a helper function to run the given dependent handlers
-func Deps(ctx context.Context, fns ...HandlerFunc) (context.Context, error) {
+func Deps(ctx context.Context, fns ...HandlerFunc) error {
 	var err error
+	args := Args(ctx)
 
 	for _, fn := range fns {
-		ctx, err = fn(ctx)
+		err := fn(ctx, args)
 		if err != nil {
-			return ctx, err
+			return err
 		}
 	}
 
-	return ctx, err
+	return err
 }
 
 // Sh is a helper function for executing shell commands

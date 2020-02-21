@@ -12,19 +12,12 @@ matr command
 $ go get github.com/matr-builder/matr
 ```
 
-matr package
-
-```bash
-$ go get github.com/matr-builder/matr/matr
-```
-
 ## Usage
 
 Execute target func
 
 ```bash
-$ matr someTarget
-output...
+$ matr [target]
 ```
 
 List available targets and matr flags
@@ -32,10 +25,6 @@ List available targets and matr flags
 ```bash
 $ matr -h
 Usage: matr <opts> [target] args...
-
-Options:
-  -matrfile  Matrfile path (default "./")
-  -h         Display usage info
 
 Targets:
    build    Build will builds the project
@@ -54,8 +43,8 @@ $ matr -h [target]
 
 ## Matrfile
 
-A matr file is any regular go file. Matrfiles must be marked with a build target of "matr" 
-and be a package main file. The default Matrfile is `./Matrfile.go` or `./Matrfile` to avoid 
+A matr file is any regular go file. Matrfiles must be marked with a build target of "matr"
+and be a package main file. The default Matrfile is `./Matrfile.go` or `./Matrfile` to avoid
 conflicts. A custom Matrfile path can be defined with the `-matrfile` flag (example: `matr -matrfile /somepath/yourfile.go`)
 
 Example Matrfile header
@@ -68,8 +57,8 @@ package main
 
 ## Targets
 
-Any exported function that is `func(context.Context) (context.Context, error)` is considered a
-matr target. If the function returns an error it will print to stdout and cause the matrfile 
+Any exported function that is `func(context.Context) error` is considered a
+matr target. If the function returns an error it will print to stdout and cause the matrfile
 to exit with an exit with a non 0 exit code.
 
 Comments on the target function will become documentation accessible by running
@@ -77,59 +66,39 @@ Comments on the target function will become documentation accessible by running
 sentence from their docs.
 
 A target may be designated the default target, which is run when the user runs
-matr with no target specified. To denote the default, create a function named `Default`. 
-If no default target is specified, running `matr` with no target will print the list of targets 
+matr with no target specified. To denote the default, create a function named `Default`.
+If no default target is specified, running `matr` with no target will print the list of targets
 and docs.
-
-## Args
-
-The helper function `matr.Args(ctx)` is passed the context and returns any additional arguments
-passed in with the target.
-
-```go
-// $ matr build dev
-func Build(ctx context.Context) (context.Context, error) {
-    args := matr.Args(ctx)
-    fmt.Println("Running build with args:", args) // [dev]
-
-    return ctx, err
-}
-```
 
 ## Dependencies
 
 The helper function `matr.Deps(ctx, ...matr.HandlerFunc)` may be passed a context and any number of
-functions (they do not have to be exported), and the Deps function will not return until all 
+functions (they do not have to be exported), and the Deps function will not return until all
 declared dependencies have been run (and any dependencies they have are run).
 
 ### Example Dependencies
 
 ```go
-func Build(ctx context.Context) (context.Context, error) {
-    ctx, err := matr.Deps(ctx, F, G)
+func Build(ctx context.Context) error {
+    err := matr.Deps(ctx, F, G)
     fmt.Println("Build running")
-    return ctx, err
+    return err
 }
 
-func F(ctx context.Context) (context.Context, error) {
-    ctx, err := matr.Deps(ctx, h)
+func F(ctx context.Context) error {
+    err := matr.Deps(ctx, h)
     fmt.Println("f running")
-    return ctx, err
+    return err
 }
 
-func G(ctx context.Context) (context.Context, error) {
-    ctx, err := matr.Deps(ctx, F)
+func G(ctx context.Context) error {
+    err := matr.Deps(ctx, F)
     fmt.Println("g running")
-    return ctx, err
+    return err
 }
 
-func h(ctx context.Context) (context.Context, error) {
+func h(ctx context.Context) error {
     fmt.Println("h running")
-    return ctx, err
+    return err
 }
 ```
-
-## Credits
-
-Special thanks to the [magefile/mage](https://github.com/magefile/mage) for the make like builder idea
-

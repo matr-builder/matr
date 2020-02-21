@@ -3,10 +3,17 @@ package matr
 import (
 	"context"
 	"errors"
+	"fmt"
+	"os"
+	"text/tabwriter"
 )
 
 // ContextKey is used to identify matr values in the context
 type ContextKey string
+
+const (
+	ctxArgsKey ContextKey = "matr_args"
+)
 
 // Matr is the root structure
 type Matr struct {
@@ -21,13 +28,47 @@ func New() *Matr {
 	}
 }
 
-// TaskNames returns an []string of the available task names
+// TaskNames returns a silce of the available task names
 func (m *Matr) TaskNames() []string {
 	names := []string{}
 	for n := range m.tasks {
 		names = append(names, n)
 	}
 	return names
+}
+
+// PrintUsage is a helper function to output the usage docs to stdout
+func (m *Matr) PrintUsage(cmd string) {
+	var err error
+
+	if cmd != "" {
+		for _, c := range m.tasks {
+			if c.Name == cmd {
+				fmt.Println("matr " + cmd + " :\n")
+				fmt.Println(c.Doc)
+				fmt.Println("")
+				return
+			}
+		}
+		err = errors.New("ERROR: no handler found for target \"" + cmd + "\"")
+	}
+
+	fmt.Println("\nUsage: matr <opts> [target] args...")
+
+	fmt.Println("\nTargets:")
+	tw := tabwriter.NewWriter(os.Stdout, 0, 0, 3, ' ', 0)
+	for _, t := range m.tasks {
+		if t.Name == "Default" {
+			continue
+		}
+		fmt.Fprintf(tw, "	%s\t%s\n", t.Name, t.Summary)
+	}
+	tw.Flush()
+	fmt.Println(" ")
+	if err != nil {
+		os.Stderr.WriteString(err.Error() + "\n")
+		return
+	}
 }
 
 // Handle registers a new task handler with matr. The Handler will then be referenceable by the provided name,
@@ -43,21 +84,37 @@ func (m *Matr) Handle(task *Task) {
 
 // Run will execute the requested task function with the provided context and arguments.
 func (m *Matr) Run(ctx context.Context, args ...string) error {
+	argsLen := len(args)
+	if argsLen > 0 && args[0] == "-h" {
+		cmd := ""
+		if argsLen > 1 {
+			cmd = args[1]
+		}
+		m.PrintUsage(cmd)
+		return nil
+	}
+
 	var handlerArgs []string
 
 	taskName := "default"
 
-	if len(args) != 0 {
+	if argsLen != 0 {
 		taskName = args[0]
 	}
 
-	if len(args) > 1 {
+	if argsLen > 1 {
 		handlerArgs = args[1:]
 	}
 
-	ctx = context.WithValue(ctx, ContextKey("args"), handlerArgs)
+	ctx = context.WithValue(ctx, ctxArgsKey, handlerArgs)
 
-	ctx, err := m.execTask(ctx, taskName)
+	task, ok := m.tasks[taskName]
+	if !ok {
+		m.PrintUsage("")
+		return fmt.Errorf("no handler found for target \"%s\"", taskName)
+	}
+
+	err := task.Handler(ctx, handlerArgs)
 	if m.onExit != nil {
 		m.onExit(ctx, err)
 	}
@@ -69,24 +126,4 @@ func (m *Matr) Run(ctx context.Context, args ...string) error {
 func (m *Matr) OnExit(fn func(ctx context.Context, err error)) {
 	m.onExit = fn
 	return
-}
-
-func (m *Matr) execTask(ctx context.Context, name string) (context.Context, error) {
-	var err error
-
-	task, ok := m.tasks[name]
-	if !ok {
-		t, ok := m.tasks["default"]
-		if !ok {
-			return ctx, errors.New("No Default handler defined")
-		}
-		return t.Handler(ctx)
-	}
-
-	ctx, err = task.Handler(ctx)
-	if err != nil {
-		return ctx, err
-	}
-
-	return ctx, nil
 }
