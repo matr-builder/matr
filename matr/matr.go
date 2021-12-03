@@ -8,6 +8,8 @@ import (
 	"text/tabwriter"
 )
 
+var Version = "v0.1.0"
+
 // ContextKey is used to identify matr values in the context
 type ContextKey string
 

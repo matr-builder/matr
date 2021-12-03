@@ -8,7 +8,7 @@ import (
 	"github.com/matr-builder/matr/parser"
 )
 
-const defaultTemplate = `// +build matr
+const defaultTemplate = `//go:build matr
 
 package main
 

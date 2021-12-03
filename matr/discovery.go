@@ -21,6 +21,7 @@ const (
 var (
 	matrFilePath string
 	helpFlag     bool
+	versionFlag  bool
 )
 
 // Run is the primary entrypoint to matrs cli tool.
@@ -29,7 +30,12 @@ func Run() {
 	// TODO: clean up this shit show
 	flag.StringVar(&matrFilePath, "matrfile", "./", "path to Matrfile")
 	flag.BoolVar(&helpFlag, "h", false, "Display usage info")
+	flag.BoolVar(&versionFlag, "v", false, "Display version")
 	flag.Parse()
+	if versionFlag {
+		fmt.Println(Version)
+		return
+	}
 
 	args := flag.Args()
 
