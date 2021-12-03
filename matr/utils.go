@@ -3,9 +3,12 @@ package matr
 import (
 	"context"
 	"fmt"
-	"os"
 	"os/exec"
 )
+
+type Cmd struct {
+	*exec.Cmd
+}
 
 // Args returns the handler args from the context
 func Args(ctx context.Context) []string {
@@ -44,10 +47,8 @@ func Deps(ctx context.Context, fns ...HandlerFunc) error {
 }
 
 // Sh is a helper function for executing shell commands
-func Sh(cmdStr string, args ...interface{}) *exec.Cmd {
+func Sh(cmdStr string, args ...interface{}) *Cmd {
 	cmdStr = fmt.Sprintf(cmdStr, args...)
-	cmd := exec.Command("sh", "-c", cmdStr)
-	cmd.Stderr = os.Stderr
-	cmd.Stdout = os.Stdout
-	return cmd
+	c := exec.Command("sh", "-c", cmdStr)
+	return &Cmd{Cmd: c}
 }

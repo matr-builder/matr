@@ -1,3 +1,4 @@
+//go:build matr
 // +build matr
 
 package main
@@ -5,6 +6,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
@@ -23,11 +25,12 @@ func Build(ctx context.Context, args []string) error {
 	matr.Deps(ctx, Proto, Test)
 	fmt.Println("Building...")
 
-	err := matr.Sh(`
+	out, err := matr.Sh(`
 		ls -la
 		echo $GOPATH
 		ls -l
-	`).Run()
+	`).Output()
+	os.Stdout.Write(out)
 	return err
 }
 
