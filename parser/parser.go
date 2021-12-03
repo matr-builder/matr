@@ -36,9 +36,10 @@ func Parse(file string) ([]Command, error) {
 	}
 
 	funcs := []Command{}
-
-	if len(f.Comments) == 0 || f.Comments[0].Pos() != 1 || f.Comments[0].Text() != "+build matr\n" {
-		return funcs, errors.New("invalid Matrfile: o matr build tag found")
+	if len(f.Comments) == 0 || f.Comments[0].Pos() != 1 ||
+		len(f.Comments[0].List) < 0 ||
+		f.Comments[0].List[0].Text != "//go:build matr" {
+		return funcs, errors.New("invalid Matrfile: matr build tag missing or incorrect:" + f.Comments[0].List[0].Text)
 	}
 
 	for _, d := range f.Decls {

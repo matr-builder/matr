@@ -1,5 +1,4 @@
 //go:build matr
-// +build matr
 
 package main
 
