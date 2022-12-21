@@ -1,3 +1,5 @@
+# Notice: this repo has been moved to https://github.com/euforic/matr
+
 # matr
 
 [![GoDoc](https://godoc.org/github.com/matr-builder/matr?status.svg)](https://godoc.org/github.com/matr-builder/matr)
